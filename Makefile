@@ -43,13 +43,13 @@ test_%: test_%.o $(OBJS_LIB)
 
 cpy-cache-test: $(TESTS)
 	echo 3 | sudo tee /proc/sys/vm/drop_caches;
-	sudo perf stat --repeat 100 \
+	sudo perf stat --repeat 1000 \
 		-e cache-misses,cache-references,instructions,cycles \
 		./test_cpy < test_data.txt
 	
 ref-cache-test: $(TESTS)
 	echo 3 | sudo tee /proc/sys/vm/drop_caches;
-	sudo perf stat --repeat 100 \
+	sudo perf stat --repeat 1000 \
 		-e cache-misses,cache-references,instructions,cycles \
 		./test_ref < test_data.txt
 
