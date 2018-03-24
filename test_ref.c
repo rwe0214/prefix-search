@@ -51,8 +51,10 @@ int main(int argc, char **argv)
     int count = 0;
     t1 = tvgetf();
     while ((rtn = fscanf(fp, "%s", word)) != EOF) {
-        char *p = word;
+        char *p = strdup(word);
         ptr[idx] = p;
+        for(int i=0; i<idx-1; i++)
+            count += (p == ptr[i]) ? 1 : 0;
         /* FIXME: insert reference to each string */
         if (!tst_ins_del(&root, &p, INS, REF)) {
             fprintf(stderr, "error: memory exhausted, tst_insert.\n");
@@ -62,12 +64,11 @@ int main(int argc, char **argv)
         idx++;
     }
     t2 = tvgetf();
-    for(int i=1; i<idx; i++)
-        count += (ptr[0] == ptr[i]) ? 1 : 0;
+
     fclose(fp);
     printf("ternary_tree, loaded %d words in %.6f sec\n", idx, t2 - t1);
     printf("\n##NOTE##\n");
-    printf("Use \"*p = word\"\n");
+    printf("Use \"strdup()\"\n");
     printf("The addr pointed by tst-tree's nodes' key is repeated at %d times during the tst-tree constructing period.\n", count);
     for (;;) {
         char *p;
