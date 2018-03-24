@@ -41,6 +41,18 @@ test_%: test_%.o $(OBJS_LIB)
 	$(VECHO) "  CC\t$@\n"
 	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF .$@.d $<
 
+cpy-cache-test: $(TESTS)
+	echo 3 | sudo tee /proc/sys/vm/drop_caches;
+	sudo perf stat --repeat 100 \
+		-e cache-misses,cache-references,instructions,cycles \
+		./test_cpy < test_data.txt
+	
+ref-cache-test: $(TESTS)
+	echo 3 | sudo tee /proc/sys/vm/drop_caches;
+	sudo perf stat --repeat 100 \
+		-e cache-misses,cache-references,instructions,cycles \
+		./test_ref < test_data.txt
+
 clean:
 	$(RM) $(TESTS) $(OBJS)
 	$(RM) $(deps)
