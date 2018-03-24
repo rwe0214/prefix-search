@@ -47,12 +47,14 @@ int main(int argc, char **argv)
         fprintf(stderr, "error: file open failed '%s'.\n", argv[1]);
         return 1;
     }
-
+    void *ptr[259112];
+    int count = 0;
     t1 = tvgetf();
     while ((rtn = fscanf(fp, "%s", word)) != EOF) {
         char *p = word;
+        ptr[idx] = p;
         /* FIXME: insert reference to each string */
-        if (!tst_ins_del(&root, &p, INS, CPY)) {
+        if (!tst_ins_del(&root, &p, INS, REF)) {
             fprintf(stderr, "error: memory exhausted, tst_insert.\n");
             fclose(fp);
             return 1;
@@ -60,10 +62,13 @@ int main(int argc, char **argv)
         idx++;
     }
     t2 = tvgetf();
-
+    for(int i=1; i<idx; i++)
+        count += (ptr[0] == ptr[i]) ? 1 : 0;
     fclose(fp);
     printf("ternary_tree, loaded %d words in %.6f sec\n", idx, t2 - t1);
-
+    printf("\n##NOTE##\n");
+    printf("Use \"*p = word\"\n");
+    printf("The addr pointed by tst-tree's nodes' key is repeated at %d times during the tst-tree constructing period.\n", count);
     for (;;) {
         char *p;
         printf(
@@ -87,7 +92,7 @@ int main(int argc, char **argv)
             p = word;
             t1 = tvgetf();
             /* FIXME: insert reference to each string */
-            res = tst_ins_del(&root, &p, INS, CPY);
+            res = tst_ins_del(&root, &p, INS, REF);
             t2 = tvgetf();
             if (res) {
                 idx++;
@@ -139,7 +144,7 @@ int main(int argc, char **argv)
             printf("  deleting %s\n", word);
             t1 = tvgetf();
             /* FIXME: remove reference to each string */
-            res = tst_ins_del(&root, &p, DEL, CPY);
+            res = tst_ins_del(&root, &p, DEL, REF);
             t2 = tvgetf();
             if (res)
                 printf("  delete failed.\n");
